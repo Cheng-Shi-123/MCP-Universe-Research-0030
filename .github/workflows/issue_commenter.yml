@@ -1,0 +1,35 @@
+name: Issue Label Commenter
+on:
+  issues:
+    types: [opened, labeled]
+jobs:
+  comment_based_on_label:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Post comment for labels
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const issueLabels = context.payload.issue.labels.map(label => label.name);
+            if (issueLabels.includes('bug')) {
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: 'Thank you. We will fix it.'
+              });
+            } else if (issueLabels.includes('feature')) {
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: 'Thank you, we will consider to include this feature.'
+              });
+            } else if (issueLabels.includes('discussion')) {
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: 'Thanks for starting this discussion! We welcome community input.'
+              });
+            }
